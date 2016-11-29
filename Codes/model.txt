@@ -1,0 +1,5 @@
+NB_LINES = 3
+LINE 1 : T1 -> End
+LINE 2 : T2 -> T3 -> T4 -> End
+LINE 3 : T5 -> End
+LINE 4 : T6 -> T7 -> End
