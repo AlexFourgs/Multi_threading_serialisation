@@ -8,14 +8,20 @@ typedef struct element_thread element_thread; // Un élément qui contient un th
 typedef struct thread_c thread_c ;
 typedef struct line line ; // Un élément qui contient le numéro de la ligne et un pointeur vers la liste chaînée de threads correspondant.
 
+/**
+    Structure pour la liste de thread.
+**/
 struct element_thread{
   char* thread_number ;
-  pthread_t thread ;
+  //pthread_t thread ;
   struct element_thread *next ;
 };
 
 typedef element_thread* thread_list ;
 
+/**
+    Structure pour la liste de ligne.
+**/
 struct line{
   int line ;
   thread_list thread_line ;
@@ -24,15 +30,9 @@ struct line{
 
 typedef line* line_list ;
 
-thread_list addTop(thread_list list, char* thread_number){
-  element_thread* newElement = (element_thread*)malloc(sizeof(element_thread));
-
-  newElement->thread_number = thread_number ;
-  newElement->next = list ;
-
-  return newElement ;
-}
-
+/**
+    Fonction pour ajouter un élément à la fin de la liste de threads.
+**/
 thread_list addLast(thread_list list, char* thread_number){
   element_thread* newElement = (element_thread*)malloc(sizeof(element_thread));
 
@@ -52,6 +52,9 @@ thread_list addLast(thread_list list, char* thread_number){
   }
 }
 
+/**
+    Fonction pour afficher la liste de threads.
+**/
 void printf_thread_list(thread_list list){
   element_thread* actual = list ;
 
@@ -62,7 +65,9 @@ void printf_thread_list(thread_list list){
   printf("End\n");
 }
 
-
+/**
+    Fonction pour ajouter un élément à la fin de la liste de ligne.
+**/
 line_list addLast_line_list(line_list list, int nb_line, thread_list threads_list){
   line* newElement = (line*)malloc(sizeof(line));
 
@@ -71,19 +76,28 @@ line_list addLast_line_list(line_list list, int nb_line, thread_list threads_lis
   newElement->next = NULL ;
 
   if (list == NULL){
+    //printf("%d\n", nb_line);
+    //printf_thread_list(newElement->thread_line);
     return newElement ;
   }
   else {
     line* actual = list ;
+    //printf("%d\n", nb_line);
+    //printf_thread_list(actual->thread_line);
+
     while(actual->next != NULL){
-      actual = actual->next;
+      //printf("AJOUT LIGNE\n");
+      //printf_thread_list(actual->thread_line);
+      actual = actual->next ;
     }
     actual->next = newElement ;
     return list ;
   }
 }
 
-
+/**
+    Fonction pour afficher la liste de ligne et les listes de threads correspondants.
+**/
 void printf_line_list(line_list list){
   line* actual = list ;
 
@@ -94,6 +108,9 @@ void printf_line_list(line_list list){
   }
 }
 
+/**
+    Fonction qui renvoi la taille d'une liste de ligne.
+**/
 int lenght_line_list(line_list list){
   int lenght = 0 ;
 
@@ -105,9 +122,37 @@ int lenght_line_list(line_list list){
   return lenght ;
 }
 
+
 /**
                                   ***FONCTIONS DE PARSING***
 **/
+thread_list parse_line(char line[]){
+  thread_list actual_line_list_threads = NULL ;
+
+  // strtok par rapport à ":"
+  char* token ;
+  char* token2 ;
+  int counter_thread = 0 ;
+
+  // On récupère seulement ce qu'il y a après "LINE X :"
+  token = strtok(line, ":");
+  token = strtok(NULL, ":");
+
+  // On récupère ce qu'il y a entre les flèches.
+  token2 = strtok(token, "->");
+
+  while((token2 != NULL) && (strcmp(token2, " End\n"))){
+    counter_thread++ ;
+    actual_line_list_threads = addLast(actual_line_list_threads, token2);
+    token2 = strtok(NULL, "->");
+  }
+  printf("J'ajoute :\n");
+  printf_thread_list(actual_line_list_threads);
+  printf("À la liste de ligne.\n");
+
+  return actual_line_list_threads ;
+}
+
 void parse_model(FILE* file){
   char line[1000] = "" ;
   int counter = 0 ;
@@ -115,28 +160,10 @@ void parse_model(FILE* file){
 
   while(fgets(line, 100, file) != NULL){
     if(counter != 0){
-      thread_list actual_line_list_threads = NULL ;
+      printf("counter : %d\n", counter);
 
-      // strtok par rapport à ":"
-      char* token ;
-      char* token2 ;
-      int counter_thread = 0 ;
+      thread_list actual_line_list_threads = parse_line(line);
 
-      // On récupère seulement ce qu'il y a après "LINE X :"
-      token = strtok(line, ":");
-      token = strtok(NULL, ":");
-
-      // On récupère ce qu'il y a entre les flèches.
-      token2 = strtok(token, "->");
-
-      while((token2 != NULL) && (strcmp(token2, " End\n"))){
-        counter_thread++ ;
-
-        printf("token2 : %s\n", token2);
-        actual_line_list_threads = addLast(actual_line_list_threads, token2);
-        
-        token2 = strtok(NULL, "->");
-      }
       printf("J'ajoute :\n");
       printf_thread_list(actual_line_list_threads);
       printf("À la liste de ligne.\n");

@@ -19,7 +19,7 @@ int main (int argc, char* argv[]){
 
   read_model((char*)"model.txt", (char*)"r");
 
-  
+
   /*pthread_create(&t1, NULL, thread_concurrent, NULL);
   pthread_create(&t2, NULL, thread_serial, &two);
   pthread_create(&t3, NULL, thread_serial, &three);
